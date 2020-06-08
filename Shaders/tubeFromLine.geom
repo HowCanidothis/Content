@@ -4,10 +4,21 @@
 layout(lines) in;
 layout(triangle_strip, max_vertices = 32) out;
 
-out vec3 worldNormal;
-out vec3 worldPosition;
+in vData
+{
+  vec3 color;
+  vec4 position;
+} vertices[];
+
+out fData
+{
+  vec3 color;
+  vec3 normal;
+  vec3 position;
+} frag;
 
 uniform mat4 mvp;
+uniform mat4 invertedMvp;
 
 vec3 createPerp(vec3 p1, vec3 p2)
 {
@@ -42,29 +53,35 @@ vec3 rotate( vec3 v, float a )
 */
 void main()
 {
-   float r1 = gl_PositionIn[0].w;
-   float r2 = gl_PositionIn[1].w;
+   float r1 = vertices[0].position.w;
+   float r2 = vertices[1].position.w;
 
-   vec3 axis = gl_PositionIn[1].xyz - gl_PositionIn[0].xyz;
+   //mat4 normalMatrix = transpose(inverse(mvp));
 
-   vec3 perpx = createPerp( gl_PositionIn[1].xyz, gl_PositionIn[0].xyz );
+   vec3 axis = vertices[1].position.xyz - vertices[0].position.xyz;
+
+   vec3 perpx = createPerp( vertices[1].position.xyz, vertices[0].position.xyz );
    vec3 perpy = cross( normalize(axis), perpx );
    int segs = 16;
    for(int i=0; i<segs; i++) {
       float a = i/float(segs-1) * 2.0 * 3.14159;
       float ca = cos(a); float sa = sin(a);
-      worldNormal = vec3( ca*perpx.x + sa*perpy.x,
+      vec3 worldNormal = normalize(vec3( ca*perpx.x + sa*perpy.x,
                      ca*perpx.y + sa*perpy.y,
-                     ca*perpx.z + sa*perpy.z );
+                     ca*perpx.z + sa*perpy.z ));
 
-      vec3 p1 = gl_PositionIn[0].xyz + r1*worldNormal;
-      vec3 p2 = gl_PositionIn[1].xyz + r2*worldNormal;
+      vec3 p1 = vertices[0].position.xyz + r1*worldNormal;
+      vec3 p2 = vertices[1].position.xyz + r2*worldNormal;
       
-      gl_Position = mvp * vec4(p1, 1.0);
-      worldPosition = gl_Position.xyz;
-      EmitVertex();
+      //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
+
       gl_Position = mvp * vec4(p2, 1.0);
-      worldPosition = gl_Position.xyz;
+      frag.color = vertices[0].color;
+      frag.normal = worldNormal;
+      frag.position = p2;
+      EmitVertex();
+      gl_Position = mvp * vec4(p1, 1.0);
+      frag.position = p1;
       EmitVertex();
    }
    EndPrimitive();   
