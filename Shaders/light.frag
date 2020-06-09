@@ -1,14 +1,13 @@
-#version 150 core
+#version 450
 
 in fData
 {
-  vec3 color;
-  vec3 normal;
+  flat vec3 normal;
   vec3 position;
 } frag;
 
-uniform vec3 COLOR;
-uniform vec3 eyeposition;
+uniform vec3 maincolor;
+uniform vec3 eyePosition;
 uniform vec3 FORWARD;
 uniform mat4 mvp;
 
@@ -43,7 +42,7 @@ vec4 phongFunction(const in vec3 ambientColor,
 {
     float specular = 0.0;
     float lambertian = 0.0;
-    applyLight(vec3(1.0, 1.0, 0.0), worldPosition, worldNormal, shininess, specular, lambertian);
+    //applyLight(vec3(0.0, 0.0, -1.0), worldPosition, worldNormal, shininess, specular, lambertian);
     applyLight(FORWARD, worldPosition, worldNormal, shininess, specular, lambertian);
     specular /= 2.0;
     lambertian /= 2.0;
@@ -60,20 +59,5 @@ vec4 phongFunction(const in vec3 ambientColor,
 
 void main()
 {
-    vec3 worldView = eyeposition - frag.position;
-    float distanceToFragment = length(worldView);
-
-    if(distanceToFragment > 5000.0) {
-        discard;
-    } else if(!gl_FrontFacing) {
-        if(distanceToFragment > 50.0) {
-            fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 125.0, frag.position, frag.normal);
-        } else {
-            discard;
-        }
-    } else if(distanceToFragment < 1000.0) {
-        fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 125.0, frag.position, -frag.normal);
-    } else {
-        discard;
-    }
+    fragColor = phongFunction(vec3(0.5), vec3(1.0), vec3(0.0), 0.0, frag.position, frag.normal);
 }

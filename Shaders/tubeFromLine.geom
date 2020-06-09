@@ -75,13 +75,13 @@ void main()
       
       //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
 
-      gl_Position = mvp * vec4(p2, 1.0);
+      gl_Position = mvp * vec4(p1, 1.0);
       frag.color = vertices[0].color;
       frag.normal = worldNormal;
-      frag.position = p2;
-      EmitVertex();
-      gl_Position = mvp * vec4(p1, 1.0);
       frag.position = p1;
+      EmitVertex();
+      gl_Position = mvp * vec4(p2, 1.0);
+      frag.position = p2;
       EmitVertex();
    }
    EndPrimitive();   
