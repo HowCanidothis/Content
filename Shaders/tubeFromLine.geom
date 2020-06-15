@@ -6,13 +6,11 @@ layout(triangle_strip, max_vertices = 32) out;
 
 in vData
 {
-  vec3 color;
   vec4 position;
 } vertices[];
 
 out fData
 {
-  vec3 color;
   vec3 normal;
   vec3 position;
 } frag;
@@ -76,7 +74,6 @@ void main()
       //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
 
       gl_Position = mvp * vec4(p1, 1.0);
-      frag.color = vertices[0].color;
       frag.normal = worldNormal;
       frag.position = p1;
       EmitVertex();

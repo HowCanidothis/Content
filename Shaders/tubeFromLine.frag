@@ -2,7 +2,6 @@
 
 in fData
 {
-  vec3 color;
   vec3 normal;
   vec3 position;
 } frag;
@@ -67,12 +66,12 @@ void main()
         discard;
     } else if(!gl_FrontFacing) {
         if(distanceToFragment > 50.0) {
-            fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 125.0, frag.position, frag.normal);
+            fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 125.0, frag.position, -frag.normal);
         } else {
             discard;
         }
     } else if(distanceToFragment < 1000.0) {
-        fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 125.0, frag.position, -frag.normal);
+        fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 125.0, frag.position, frag.normal);
     } else {
         discard;
     }
