@@ -5,7 +5,7 @@ uniform vec3 eyeposition;
 
 in vData
 {
-    vec3 color;
+    flat uint state;
     vec3 position;
 } vertex;
 
