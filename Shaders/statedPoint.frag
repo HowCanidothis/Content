@@ -1,4 +1,4 @@
-#version 450
+#version 400
 
 uniform vec4 COLOR;
 uniform vec3 eyeposition;
