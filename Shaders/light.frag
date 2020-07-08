@@ -59,5 +59,5 @@ vec4 phongFunction(const in vec3 ambientColor,
 
 void main()
 {
-    fragColor = phongFunction(vec3(0.5), vec3(1.0), vec3(0.0), 0.0, frag.position, frag.normal);
+    fragColor = phongFunction(maincolor.rgb / 2.0, maincolor, vec3(0.0), 0.0, frag.position, frag.normal);
 }
