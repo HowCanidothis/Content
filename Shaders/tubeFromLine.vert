@@ -9,5 +9,5 @@ out vData
 
 void main()
 {
-    vertex.position = vec4( vertexPosition, 1.0 );
+    vertex.position = vec4(vertexPosition, 1.0);
 }

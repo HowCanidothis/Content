@@ -15,6 +15,7 @@ out fData
   vec3 position;
 } frag;
 
+uniform mat4 modelMatrix;
 uniform mat4 mvp;
 uniform mat4 invertedMvp;
 
@@ -73,11 +74,11 @@ void main()
       
       //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
 
-      gl_Position = mvp * vec4(p1, 1.0);
+      gl_Position = mvp * modelMatrix * vec4(p1, 1.0);
       frag.normal = worldNormal;
       frag.position = p1;
       EmitVertex();
-      gl_Position = mvp * vec4(p2, 1.0);
+      gl_Position = mvp * modelMatrix * vec4(p2, 1.0);
       frag.position = p2;
       EmitVertex();
    }
