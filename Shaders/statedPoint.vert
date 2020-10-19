@@ -4,7 +4,7 @@ layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in uint vertexState;
 
 uniform mat4 MVP;
-uniform mat4 modelMatrix;
+uniform mat4 MODEL_MATRIX;
 
 out vData
 {
@@ -21,5 +21,5 @@ void main()
     }
     vertex.state = vertexState;
     vertex.position = vertexPosition;
-    gl_Position = MVP * modelMatrix * vec4(vertexPosition, 1.0);
+    gl_Position = MVP * MODEL_MATRIX * vec4(vertexPosition, 1.0);
 }

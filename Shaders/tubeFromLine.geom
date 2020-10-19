@@ -15,9 +15,8 @@ out fData
   vec3 position;
 } frag;
 
-uniform mat4 modelMatrix;
-uniform mat4 mvp;
-uniform mat4 invertedMvp;
+uniform mat4 MODEL_MATRIX;
+uniform mat4 MVP;
 
 vec3 createPerp(vec3 p1, vec3 p2)
 {
@@ -74,11 +73,11 @@ void main()
       
       //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
 
-      gl_Position = mvp * modelMatrix * vec4(p1, 1.0);
+      gl_Position = MVP * MODEL_MATRIX * vec4(p1, 1.0);
       frag.normal = worldNormal;
       frag.position = p1;
       EmitVertex();
-      gl_Position = mvp * modelMatrix * vec4(p2, 1.0);
+      gl_Position = MVP * MODEL_MATRIX * vec4(p2, 1.0);
       frag.position = p2;
       EmitVertex();
    }
