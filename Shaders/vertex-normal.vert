@@ -1,19 +1,19 @@
 #version 450
 uniform mat4 MVP;
 layout(location = 0) in vec3 a_vertex;
-in vec3 a_vertexNormal;
+layout(location = 1) in vec3 a_vertexNormal;
 
-uniform mat4 invertedMVP;
+uniform mat4 MODEL_MATRIX;
 
 out fData
 {
-  flat vec3 normal;
+  vec3 normal;
   vec3 position;
 } frag;
 
 void main()
 {
-    frag.position = a_vertex;
-    frag.normal = -a_vertexNormal; // vec3(invertedMVP * vec4(a_vertexNormal, 0.0));
-    gl_Position = MVP * vec4(a_vertex, 1.0);
+    frag.position = (MODEL_MATRIX * vec4(a_vertex, 1.0)).xyz;
+    frag.normal = normalize((MODEL_MATRIX * vec4(a_vertexNormal, 0.0)).xyz);
+    gl_Position = MVP * MODEL_MATRIX * vec4(a_vertex, 1.0);
 }
