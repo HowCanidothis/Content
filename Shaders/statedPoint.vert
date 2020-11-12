@@ -5,6 +5,7 @@ layout(location = 1) in uint vertexState;
 
 uniform mat4 MVP;
 uniform mat4 MODEL_MATRIX;
+uniform float POINT_SIZE;
 
 out vData
 {
@@ -17,7 +18,7 @@ void main()
     if(vertexState == 1u) {
         gl_PointSize = 20.0;
     } else {
-        gl_PointSize = 10.0;
+        gl_PointSize = POINT_SIZE;
     }
     vertex.state = vertexState;
     vertex.position = vertexPosition;

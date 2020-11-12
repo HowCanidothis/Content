@@ -73,12 +73,14 @@ void main()
       
       //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
 
-      gl_Position = MVP * MODEL_MATRIX * vec4(p1, 1.0);
+      vec4 transformedPoint = MODEL_MATRIX * vec4(p1, 1.0);
+      gl_Position = MVP * transformedPoint;
       frag.normal = worldNormal;
-      frag.position = p1;
+      frag.position = transformedPoint.xyz;
       EmitVertex();
-      gl_Position = MVP * MODEL_MATRIX * vec4(p2, 1.0);
-      frag.position = p2;
+      transformedPoint = MODEL_MATRIX * vec4(p2, 1.0);
+      gl_Position = MVP * transformedPoint;
+      frag.position = transformedPoint.xyz;
       EmitVertex();
    }
    EndPrimitive();   
