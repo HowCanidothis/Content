@@ -8,8 +8,6 @@ in fData
 
 uniform vec4 COLOR;
 uniform vec3 FORWARD;
-uniform vec3 EYE;
-uniform float SCALE;
 
 out vec4 fragColor;
 
