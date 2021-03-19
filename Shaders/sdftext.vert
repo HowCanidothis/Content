@@ -1,5 +1,5 @@
 #version 450
-uniform mat4 MVP;
+uniform mat4 MODEL_MATRIX;
 layout(location = 0) in vec3 a_vertex;
 layout(location = 1) in vec4 a_texLocation;
 layout(location = 2) in vec2 a_offsets;
@@ -22,13 +22,16 @@ out vData {
 
 void main()
 {
+    vec4 transformedPosition = (MODEL_MATRIX * vec4(a_vertex, 1.0));
+    transformedPosition /= transformedPosition.w;
     vertexData.texLocation = a_texLocation;
     vertexData.offset = a_offsets;
-    vertexData.position = a_vertex;
+    vertexData.position = transformedPosition.xyz;
     vertexData.index = a_params[0];
     vertexData.advance = a_params[1];
     vertexData.totalWidth = a_params[2];
-    vertexData.direction = a_direction;
+    vertexData.direction = (MODEL_MATRIX * vec4(a_direction, 0.0)).xyz;
     vertexData.align = a_params[3];
-    vertexData.offsetDirection = a_offsetDirection;
+    float w = a_offsetDirection.w;
+    vertexData.offsetDirection = vec4((MODEL_MATRIX * vec4(a_offsetDirection.xyz, 0.0)).xyz, w);
 }
