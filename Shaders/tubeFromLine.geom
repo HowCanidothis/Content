@@ -16,6 +16,7 @@ out fData
 } frag;
 
 uniform mat4 MODEL_MATRIX;
+uniform vec3 EYE;
 uniform mat4 MVP;
 
 vec3 createPerp(vec3 p1, vec3 p2)
@@ -51,14 +52,31 @@ vec3 rotate( vec3 v, float a )
 */
 void main()
 {
+   vec3 pos1 = (MODEL_MATRIX * vec4(vertices[0].position.xyz, 1.0)).xyz;
+   vec3 pos2 = (MODEL_MATRIX * vec4(vertices[1].position.xyz, 1.0)).xyz;
+
+   vec3 axis = pos2 - pos1;
+   vec3 toEye = EYE - pos1;
+
+   if(length(toEye) > 3000.0 && length(EYE - pos2) > 3000.0) {
+      EndPrimitive();
+      return;
+   }
+
+   vec3 projectedToEye = pos1 + axis * dot(toEye, axis) / dot(axis, axis);
+   float distanceToFragment = length(EYE - projectedToEye);
+
+   if(distanceToFragment > 2000.0) {
+       EndPrimitive();
+       return;
+   }
+
    float r1 = vertices[0].position.w;
    float r2 = vertices[1].position.w;
 
    //mat4 normalMatrix = transpose(inverse(mvp));
 
-   vec3 axis = vertices[1].position.xyz - vertices[0].position.xyz;
-
-   vec3 perpx = createPerp( vertices[1].position.xyz, vertices[0].position.xyz );
+   vec3 perpx = createPerp( pos2, pos1 );
    vec3 perpy = cross( normalize(axis), perpx );
    int segs = 16;
    for(int i=0; i<segs; i++) {
@@ -68,17 +86,17 @@ void main()
                      ca*perpx.y + sa*perpy.y,
                      ca*perpx.z + sa*perpy.z ));
 
-      vec3 p1 = vertices[0].position.xyz + r1*worldNormal;
-      vec3 p2 = vertices[1].position.xyz + r2*worldNormal;
+      vec3 p1 = pos1 + r1*worldNormal;
+      vec3 p2 = pos2 + r2*worldNormal;
       
       //vec4 normalInterp = normalMatrix * vec4(worldNormal, 0.0));
 
-      vec4 transformedPoint = MODEL_MATRIX * vec4(p1, 1.0);
+      vec4 transformedPoint = vec4(p1, 1.0);
       gl_Position = MVP * transformedPoint;
       frag.normal = worldNormal;
       frag.position = transformedPoint.xyz;
       EmitVertex();
-      transformedPoint = MODEL_MATRIX * vec4(p2, 1.0);
+      transformedPoint = vec4(p2, 1.0);
       gl_Position = MVP * transformedPoint;
       frag.position = transformedPoint.xyz;
       EmitVertex();
