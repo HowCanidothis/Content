@@ -20,7 +20,7 @@ void applyLight(const in vec3 lightDirection,
 }
 
 vec4 phongFunction(const in vec3 ambientColor,
-                   const in vec3 diffuseColor,
+                   const in vec4 diffuseColor,
                    const in vec3 specularColor,
                    const in float shininess,
                    const in vec3 worldPosition,
@@ -38,8 +38,8 @@ vec4 phongFunction(const in vec3 ambientColor,
     float Kd = 0.57;
     float Ks = 1.0;
     vec3 color = vec3(Ka * ambientColor +
-                Kd * lambertian * diffuseColor +
+                Kd * lambertian * diffuseColor.rgb +
                 Ks * specular * specularColor);
 
-    return vec4(color.rgb, 1.0);
+    return vec4(color.rgb, diffuseColor.a);
 }
