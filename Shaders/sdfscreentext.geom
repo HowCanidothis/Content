@@ -14,6 +14,7 @@ in vData {
    vec2 position;
    vec4 texLocation;
    vec2 offset;
+   vec3 color;
    float index;
    float advance;
    float totalWidth;
@@ -23,12 +24,14 @@ in vData {
 
 out fData {
     vec2 texCoord;
+    vec3 color;
 } fragData;
 
 void main()
 {
     vec2 halfScreenSize = SCREEN_SIZE / 2.0;
     int align = int(vertexData[0].align);
+    vec3 color = vertexData[0].color;
     vec2 sourceOrigin = vertexData[0].position;
     float advance = vertexData[0].advance;
     float totalHeight = TEXT_HEIGHT;
@@ -87,21 +90,25 @@ void main()
     position /= halfScreenSize;
     gl_Position = vec4(position, 0.0, 1.0);
     fragData.texCoord = topLeftTexCoord;
+    fragData.color = color;
     EmitVertex();
     position = bottomLeft.xy - halfScreenSize;
     position /= halfScreenSize;
     gl_Position = vec4(position, 0.0, 1.0);
     fragData.texCoord = bottomLeftTexCoord;
+    fragData.color = color;
     EmitVertex();
     position = topRight.xy - halfScreenSize;
     position /= halfScreenSize;
     gl_Position = vec4(position, 0.0, 1.0);
     fragData.texCoord = topRightTexCoord;
+    fragData.color = color;
     EmitVertex();
     position = bottomRight.xy - halfScreenSize;
     position /= halfScreenSize;
     gl_Position = vec4(position, 0.0, 1.0);
     fragData.texCoord = bottomRightTexCoord;
+    fragData.color = color;
     EmitVertex();
     EndPrimitive();
 }
