@@ -16,6 +16,6 @@ void main() {
     if (sumOfWeights == 0) {
         outColor = vec4(colorNT, 1.0);
          return;
-    }                                                         
-    outColor = vec4(mix(colorNT.rgb, mix(mixed.rgb, depthTransparent.rgb, depthTransparent.a), 0.9), 1.0);
+    }                                                       
+    outColor = vec4(mix(colorNT.rgb, mix(mixed.rgb, depthTransparent.rgb, depthTransparent.a), 0.5), 1.0);
 }                                                                     
