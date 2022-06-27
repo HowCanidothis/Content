@@ -28,7 +28,7 @@ vec4 phongFunction(const in vec3 ambientColor,
                    const in vec3 forward)
 {
     float specular = 0.0;
-    float lambertian = 0.0;
+    float lambertian = 1.0;
     //applyLight(vec3(0.0, 0.0, 1.0), worldPosition, worldNormal, shininess, specular, lambertian);
     applyLight(forward, worldPosition, worldNormal, shininess, specular, lambertian);
     specular /= 1.0;
