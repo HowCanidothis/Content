@@ -6,9 +6,10 @@ in fData
     vec3 color;
 } frag;
 
+uniform float ALPHA = 1.0;
 layout(location = 0) out vec4 o_Color;
 
 void main()
 {
-    o_Color = vec4(frag.color, 1.0);
+    o_Color = vec4(frag.color, ALPHA);
 }
