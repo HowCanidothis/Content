@@ -10,17 +10,19 @@ uniform float POINT_SIZE;
 out vData
 {
     flat uint state;
-    vec3 position;
 } vertex;
 
 void main()
 {
-    if(vertexState == 1u) {
-        gl_PointSize = 20.0;
+    float ps;
+    if((vertexState & 1u) == 1u) {
+        ps = 20.0;
+    } else if((vertexState & 6u) != 0u) {
+        ps = POINT_SIZE * 2.0;
     } else {
-        gl_PointSize = POINT_SIZE;
+        ps = POINT_SIZE;
     }
+    gl_PointSize = ps;
     vertex.state = vertexState;
-    vertex.position = vertexPosition;
     gl_Position = MVP * MODEL_MATRIX * vec4(vertexPosition, 1.0);
 }
