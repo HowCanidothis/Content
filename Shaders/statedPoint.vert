@@ -15,10 +15,8 @@ out vData
 void main()
 {
     float ps;
-    if((vertexState & 1u) == 1u) {
-        ps = 20.0;
-    } else if((vertexState & 6u) != 0u) {
-        ps = POINT_SIZE * 2.0;
+    if((vertexState & 7u) != 0u) {
+        ps = POINT_SIZE * 3.0;
     } else {
         ps = POINT_SIZE;
     }
