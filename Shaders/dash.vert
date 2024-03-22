@@ -1,9 +1,14 @@
-#version 330
+#version 400
 
 layout (location = 0) in vec3 inPos;
+layout (location = 2) in uint transparency;
 
-flat out vec3 startPos;
-out vec3 vertPos;
+out vData
+{
+    vec3 vertPos;
+    flat vec3 startPos;
+    flat uint transparency;
+} vertex;
 
 uniform mat4 MVP;
 
@@ -11,6 +16,7 @@ void main()
 {
     vec4 pos    = MVP * vec4(inPos, 1.0);
     gl_Position = pos;
-    vertPos     = pos.xyz / pos.w;
-    startPos    = vertPos;
+    vertex.vertPos     = pos.xyz / pos.w;
+    vertex.startPos    = vertex.vertPos;
+    vertex.transparency = transparency;
 }
