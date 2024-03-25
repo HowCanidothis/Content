@@ -18,7 +18,7 @@ void main()
 {
     float ps;
     if((vertexState & 7u) != 0u) {
-        ps = POINT_SIZE * 3.0;
+        ps = POINT_SIZE * 1.5;
     } else {
         ps = POINT_SIZE;
     }
