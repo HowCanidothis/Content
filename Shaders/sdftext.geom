@@ -5,7 +5,6 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 
 uniform sampler2D TEXTURE;
-uniform vec3 FORWARD;
 uniform mat4 MVP;
 uniform vec2 SCREEN_SIZE;
 uniform float TEXT_SCALE;
@@ -86,7 +85,7 @@ void main()
     vec2 dirNormal = vec2(direction.y, -direction.x);
     vec2 TEXTURE_SIZE = textureSize(TEXTURE, 0);
 
-    if(dot(stableDirection, vec2(1.0, 0.0)) < 0.0) {
+    if(dot(dirNormal, vec2(0.0, 1.0)) > 0.0) {
         direction = -direction;
         dirNormal = -dirNormal;
     }
