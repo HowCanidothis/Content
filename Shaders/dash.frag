@@ -21,5 +21,5 @@ void main()
 
     if (fract(dist / (u_dashSize + u_gapSize)) > u_dashSize/(u_dashSize + u_gapSize))
         discard; 
-    fragColor = vec4(COLOR.rgb, vertex.transparency / 255.0);
+    fragColor = vec4(COLOR.rgb, float(vertex.transparency) / 255.0);
 }

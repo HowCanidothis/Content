@@ -13,5 +13,5 @@ out vec4 fragColor;
 
 void main()
 {
-    fragColor = vec4(COLOR.rgb, vertex.transparency / 255.0);
+    fragColor = vec4(COLOR.rgb, float(vertex.transparency) / 255.0);
 }

@@ -1,4 +1,4 @@
-#version 400
+#version 450
 
 uniform vec4 COLOR;
 uniform vec4 COLOR2;
@@ -38,7 +38,7 @@ void main()
         color = COLOR;
     }
     if(vertex.transparency != 255) {
-        color.a = vertex.transparency / 255.0;
+        color.a = float(vertex.transparency) / 255.0;
     }
     fragColor = color;
 }
