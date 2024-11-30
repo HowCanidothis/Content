@@ -1,7 +1,9 @@
 #version 400
 
+uniform mat4 MVP;
+uniform mat4 MODEL_MATRIX;
+
 layout (location = 0) in vec3 inPos;
-layout (location = 2) in uint transparency;
 
 out vData
 {
@@ -9,12 +11,10 @@ out vData
     flat uint transparency;
 } vertex;
 
-uniform mat4 MVP;
-
 void main()
 {
     vertex.dist = abs(inPos.x) + abs(inPos.y);
-    vec4 pos    = MVP * vec4(vec3(inPos.xy, 0.0), 1.0);
+    vec4 pos    = MVP * MODEL_MATRIX * vec4(vec3(inPos.xy, 0.0), 1.0);
     gl_Position = pos;
-    vertex.transparency = transparency;
+    vertex.transparency = 255;
 }

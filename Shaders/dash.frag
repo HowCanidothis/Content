@@ -10,12 +10,21 @@ out vec4 fragColor;
 
 uniform vec4 COLOR;
 uniform vec2  SCREEN_SIZE;
-uniform float u_dashSize = 0.02;
-uniform float u_gapSize = 0.005;
+uniform uint pattern[10] = {1,1,1,1,0,1,1,1,1,0};
 
 void main()
 {
-    if (fract(vertex.dist / (u_dashSize + u_gapSize)) > u_dashSize/(u_dashSize + u_gapSize))
-        discard; 
-    fragColor = vec4(COLOR.rgb, float(vertex.transparency) / 255.0);
+    vec4 fcoord = gl_FragCoord;
+    float dist = fcoord.x + fcoord.y;
+    float modulo = mod(dist, 50.0) / 5.0;
+    uint patternValue = pattern[int(modulo)];
+    if(patternValue == 0)
+       discard;
+
+    if(fract(modulo) != 0.0 && pattern[int(mod(modulo + 1, 10))] == 0.0) {
+        discard;
+    }
+
+
+    fragColor = COLOR;
 }
