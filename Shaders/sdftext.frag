@@ -18,7 +18,6 @@ void main() {
     vec4 color = COLOR;
     vec3 borderColor = BORDER_COLOR.rgb;
     float tx=texture(TEXTURE, outTexCord).r;
-    float a=clamp((tx-params.x)*params.y, 0.0, 1.0);
-    tx *= 2.0;
-    fragColor = vec4(mix(borderColor, color.rgb, a) * tx, color.a * tx);
+    float a=clamp((params.x - tx)*params.y, 0.0, 1.0);
+    fragColor = vec4(mix(color.rgb, borderColor, a), 2.0 * tx);
 }
