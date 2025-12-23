@@ -1,43 +1,28 @@
-void applyLight(const in vec3 lightDirection,
-                const in vec3 worldNormal,
-                const in float shininess,
-                inout float specular,
-                inout float lambertian)
-{
-    vec3 N = normalize(worldNormal);
-    vec3 L = normalize(vec3(0.0,0.0,-1.0));
-    // Lambert's cosine law
-    lambertian += max(-dot(N, L), 0.0);
-    if(lambertian > 0.0) {
-        vec3 R = reflect(L, N);      // Reflected light vector
-        vec3 V = L; // Vector to viewer
-        // Compute the specular term
-        float specAngle = max(-dot(R, V), 0.0);
-        specular += pow(specAngle, shininess);
-    }
-}
+uniform float Ka = 1.0;
+uniform float Kd = 0.57;
+uniform float Ks = 0.5;
+uniform float SHININESS = 5.0;
 
 vec4 phongFunction(const in vec3 ambientColor,
                    const in vec3 diffuseColor,
                    const in vec3 specularColor,
-                   const in float shininess,
                    const in vec3 worldPosition,
                    const in vec3 worldNormal,
-                   const in vec3 forward)
+                   const in vec3 lightDirection,
+                   const in float a)
 {
+    vec3 N = normalize(worldNormal);
+    vec3 L = normalize(lightDirection);
+    // Lambert's cosine law
+    float lambertian = max(-dot(N, L), 0.0);
     float specular = 0.0;
-    float lambertian = 0.0;
-    //applyLight(vec3(0.0, 0.0, 1.0), worldPosition, worldNormal, shininess, specular, lambertian);
-    applyLight(forward, worldNormal, shininess, specular, lambertian);
-    specular /= 1.0;
-    lambertian /= 1.0;
-
-    float Ka = 1.0;
-    float Kd = 0.57;
-    float Ks = 1.0;
-    vec3 color = vec3(Ka * ambientColor +
+    if(lambertian > 0.0) {
+        vec3 R = reflect(L, N);      // Reflected light vector
+        vec3 V = normalize(L);
+        float specAngle = max(-dot(R, V), 0.0);
+        specular = pow(specAngle, SHININESS);
+    }
+    return vec4(Ka * ambientColor +
                 Kd * lambertian * diffuseColor +
-                Ks * specular * specularColor);
-
-    return vec4(color.rgb, 1.0);
+                Ks * specular * specularColor, a);
 }

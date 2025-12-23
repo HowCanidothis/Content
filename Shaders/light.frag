@@ -9,7 +9,6 @@ in fData
 uniform vec4 COLOR;
 uniform vec3 FORWARD;
 uniform vec3 EYE;
-uniform float SCALE;
 
 out vec4 fragColor;
 
@@ -17,5 +16,5 @@ out vec4 fragColor;
 
 void main()
 {
-    fragColor = phongFunction(vec3(0.1), COLOR, vec3(1.0), 2.0, frag.position, frag.normal, FORWARD);
+    fragColor = phongFunction(COLOR.rgb, COLOR.rgb, vec3(1.0), frag.position, frag.normal, FORWARD, COLOR.a);
 }

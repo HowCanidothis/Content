@@ -25,12 +25,12 @@ void main()
         discard;
     } else if(gl_FrontFacing) {
         if(distanceToFragment > 50.0) {
-            fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 1.0, frag.position, frag.normal, FORWARD);
+            fragColor = phongFunction(vec3(0.0), COLOR.rgb, vec3(1.0), frag.position, frag.normal, FORWARD, COLOR.a);
         } else {
             discard;
         }
     } else if(distanceToFragment < 1000.0) {
-        fragColor = phongFunction(vec3(0.0), COLOR, vec3(1.0), 1.0, frag.position, frag.normal, -FORWARD);
+        fragColor = phongFunction(vec3(0.0), COLOR.rgb, vec3(1.0), frag.position, frag.normal, -FORWARD, COLOR.a);
     } else {
         discard;
     }
