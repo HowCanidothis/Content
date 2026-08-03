@@ -80,7 +80,7 @@ void main()
     // We only offset XY so that vertex distribution along the Z axis is unaffected
     vec4 a_vertexBended = vec4(
         (a_vertex.xy * scaleCoef) + localBendingOffset.xy, 
-        a_vertex.z + localBendingOffset.z, 
+        localBendingOffset.z, 
         1.0
     );
 
