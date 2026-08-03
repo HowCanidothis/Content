@@ -28,20 +28,13 @@ void main()
 {
     // 1. Reconstruct the local per-instance transformation matrix
     mat4 a_transform = mat4(a_col1, a_col2, a_col3, a_col4);
-    mat4 finalModelMatrix = MODEL_MATRIX * a_transform;
-
-    // 2. Camera distance scaling calculation (Kept exactly from your previous code)
-    vec4 instanceWorldPos = finalModelMatrix[3];
-    vec4 baseClipPos = MVP * instanceWorldPos;
-    float distanceToCamera = baseClipPos.w;
-    float baseScaleFactor = 0.1; 
-    float scaleCoef = max(distanceToCamera * baseScaleFactor, 1.0);
+    mat4 baseModelMatrix = MODEL_MATRIX * a_transform;
 
     // 3. Interpolation progress along the cylinder path: t ranges from 0.0 to 1.0
     float t = clamp(a_vertex.z / MESH_MAX_Z, 0.0, 1.0);
 
     // 4. Construct the full 8-point world-space path (explicit array size)
-    vec3 pos0 = finalModelMatrix[3].xyz;
+    vec3 pos0 = baseModelMatrix[3].xyz;
     vec3 path[8] = vec3[8](
         pos0,
         a_p1.xyz,
@@ -66,6 +59,44 @@ void main()
 
     // Interpolate the exact 3D world centerline position for this vertex depth
     vec3 interpolatedWorldPos = mix(path[index], path[index + 1], segmentT);
+
+    // --- RECALCULATE MATRIX BASIS USING THE PATH DIRECTION ---
+    // Get the forward vector from the start of the segment to the current interpolated position
+    // Handle the exact start point safely (if segmentT is 0, look ahead to the next point)
+    vec3 dirVector = interpolatedWorldPos - path[index];
+    if (length(dirVector) < 0.0001) {
+        dirVector = path[index + 1] - path[index];
+    }
+    vec3 newZ = normalize(dirVector);
+
+    // Extract original scaling factors from the base model matrix columns
+    float scaleX = length(baseModelMatrix[0].xyz);
+    float scaleY = length(baseModelMatrix[1].xyz);
+    float scaleZ = length(baseModelMatrix[2].xyz);
+
+    // Extract original up/right vectors for reference orientation
+    vec3 origX = normalize(baseModelMatrix[0].xyz);
+    vec3 origY = normalize(baseModelMatrix[1].xyz);
+
+    // Reconstruct orthogonal axes matching the new path direction vector (Z-aligned cylinder pipeline)
+    vec3 newX = normalize(cross(origY, newZ));
+    vec3 newY = normalize(cross(newZ, newX));
+
+    // Reapply original scaling factors to our newly oriented basis vectors
+    vec4 updatedCol1 = vec4(newX * scaleX, 0.0);
+    vec4 updatedCol2 = vec4(newY * scaleY, 0.0);
+    vec4 updatedCol3 = vec4(newZ * scaleZ, 0.0);
+
+    // Build the final transformed model matrix containing the updated orientation frame
+    mat4 finalModelMatrix = mat4(updatedCol1, updatedCol2, updatedCol3, baseModelMatrix[3]);
+    // --------------------------------------------------------
+
+    // 2. Camera distance scaling calculation (Kept exactly from your previous code)
+    vec4 instanceWorldPos = vec4(interpolatedWorldPos, 1.0);
+    vec4 baseClipPos = MVP * instanceWorldPos;
+    float distanceToCamera = baseClipPos.w;
+    float baseScaleFactor = 0.1; 
+    float scaleCoef = max(distanceToCamera * baseScaleFactor, 1.0);
 
     // 6. Calculate local bending offset relative to the starting position
     // Removing pos0 isolates the bending delta vector
