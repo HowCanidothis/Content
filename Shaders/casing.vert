@@ -28,7 +28,7 @@ void main()
   
   // 2. Base scale factor to define the extrusion outline thickness
   // (0.015 means expanding outward by 1.5% of the total camera depth)
-  float baseScaleFactor = 0.015; 
+  float baseScaleFactor = 0.1; 
    
   // 4. Calculate the expansion offset strictly within local coordinate space
   // Since extrusionNormal is already a normalized cross-section unit vector from C++,

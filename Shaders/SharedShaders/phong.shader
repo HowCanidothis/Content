@@ -1,31 +1,48 @@
-uniform float Ka = 0.3;
-uniform float Kd = 0.57;
-uniform float Ks = 0.5;
+uniform vec3 Ka = vec3(0.3, 0.3, 0.3);
+uniform vec3 Kd = vec3(0.57, 0.57, 0.57);
+uniform vec3 Ks = vec3(0.5, 0.5, 0.5);
+
 uniform float SHININESS = 2.0;
-uniform float LIGHT_INTENSITY = 2.0;
+uniform float LIGHT_INTENSITY = 1.0;
 
 vec4 phongFunction(const in vec3 ambientColor,
                    const in vec3 diffuseColor,
                    const in vec3 specularColor,
                    const in vec3 worldPosition,
                    const in vec3 worldNormal,
-                   const in vec3 lightDirection,
+                   const in vec3 lightDirection, 
                    const in float a)
 {
     vec3 N = normalize(worldNormal);
-    vec3 L = normalize(lightDirection);
-    // Lambert's cosine law
-    float lambertian = max(-dot(N, L), 0.0);
-    float specular = 0.0;
+    vec3 L = normalize(-lightDirection); 
+    
+    vec3 ambient = Ka * ambientColor;
+    
+    float lambertian = max(dot(N, L), 0.0);
+    vec3 diffuse = Kd * lambertian * diffuseColor;
+    
+    vec3 specular = vec3(0.0);
     if(lambertian > 0.0) {
-        vec3 R = reflect(L, N);      // Reflected light vector
-        vec3 toFragment = worldPosition - EYE;
-        vec3 V = normalize(toFragment); // Vector to viewer
-        // Compute the specular term
-        float specAngle = max(-dot(R, V), 0.0);
-        specular = pow(specAngle / length(toFragment) * LIGHT_INTENSITY, SHININESS);
+        vec3 R = reflect(-L, N);                  
+        vec3 V = normalize(EYE - worldPosition);  
+        
+        float specAngle = max(dot(R, V), 0.0);
+        specular = Ks * pow(specAngle, SHININESS) * specularColor;
     }
-    return vec4(Ka * ambientColor +
-                Kd * lambertian * diffuseColor +
-                Ks * specular * specularColor, a);
+    
+    float distance = length(EYE - worldPosition); 
+    float protectedDistance = max(distance, 0.5); 
+    
+    // Attenuation calculation stays the same
+    float attenuation = 1.0 / (1.0 + 0.09 * protectedDistance + 0.032 * protectedDistance * protectedDistance);
+    float nearFade = smoothstep(0.0, 0.3, distance);
+    attenuation *= nearFade;
+    
+    // --- CHANGED LIGHTING COMBINATION ---
+    // 1. Diffuse is driven uniformly by light intensity but ignores distance attenuation.
+    // 2. Specular remains bound to distance attenuation so faraway highlights vanish naturally.
+    vec3 finalColor = ambient + (diffuse * LIGHT_INTENSITY) + (specular * LIGHT_INTENSITY * attenuation);
+    finalColor = clamp(finalColor, 0.0, 1.0);
+    
+    return vec4(finalColor, a);
 }
