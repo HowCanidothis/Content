@@ -1,46 +1,54 @@
-#version 450
+#version 310 es
+
+#undef lowp
+#undef mediump
+#undef highp
+
+precision highp float;
 
 uniform vec4 COLOR;
 uniform vec4 COLOR2;
 uniform vec4 COLOR3;
 uniform vec4 HOVER_COLOR;
 
-in vData
-{
-    flat uint state;
-    flat uint transparency;
-} vertex;
+flat in uint v_state;
+flat in uint v_transparency;
+in highp vec2 v_texCoord; // Receives custom UV coordinates from the Geometry Shader
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main()
 {
-    vec2 circCoord = 2.0 * gl_PointCoord - 1.0;
+    // Convert custom UV space [0,1] to [-1, 1] to emulate gl_PointCoord circle math
+    vec2 circCoord = 2.0 * v_texCoord - 1.0;
     float dist = dot(circCoord, circCoord);
+    
+    // Discard fragments outside the radius to shape the square quad into a clean circle
     if (dist > 1.0) {
         discard;
     }
 
     vec4 color;
     float transparency = 1.0;
-    if(vertex.transparency != 255) {
-        transparency = float(vertex.transparency) / 255.0;
+    if(v_transparency != 255u) {
+        transparency = float(v_transparency) / 255.0;
     }
 
-    if((vertex.state & 1u) == 1u) {
+    // Evaluate states using bitwise operators
+    if((v_state & 1u) == 1u) {
         transparency = 1.0;
         if (dist > 0.4) {
             color = COLOR;
         } else {
             color = HOVER_COLOR;
         }
-    } else if((vertex.state & 2u) == 2u) {
+    } else if((v_state & 2u) == 2u) {
         if (dist > 0.4) {
             color = COLOR;
         } else {
             color = COLOR2;
         }
-    } else if((vertex.state & 4u) == 4u) {
+    } else if((v_state & 4u) == 4u) {
         if (dist > 0.4) {
             color = COLOR;
         } else {

@@ -1,29 +1,21 @@
-#version 450
+#version 310 es
 
-layout(location = 0) in vec3 vertexPosition;
+#undef lowp
+#undef mediump
+#undef highp
+
+layout(location = 0) in highp vec3 vertexPosition;
 layout(location = 1) in uint vertexState;
 layout(location = 2) in uint vertexTransparency;
 
-uniform mat4 MVP;
-uniform mat4 MODEL_MATRIX;
-uniform float POINT_SIZE;
-
-out vData
-{
-    flat uint state;
-    flat uint transparency;
-} vertex;
+flat out uint vs_state;
+flat out uint vs_transparency;
 
 void main()
 {
-    float ps;
-    if((vertexState & 7u) != 0u) {
-        ps = POINT_SIZE * 1.5;
-    } else {
-        ps = POINT_SIZE;
-    }
-    gl_PointSize = ps;
-    vertex.state = vertexState;
-    vertex.transparency = vertexTransparency;
-    gl_Position = MVP * MODEL_MATRIX * vec4(vertexPosition, 1.0);
+    vs_state = vertexState & 0xFFu;
+    vs_transparency = vertexTransparency & 0xFFu;
+    
+    // Pass raw model-space position down to the geometry shader
+    gl_Position = vec4(vertexPosition, 1.0);
 }

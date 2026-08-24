@@ -1,20 +1,16 @@
-#version 450
+#version 310 es
 
-layout (location = 0) in vec3 vertexPosition;
-layout (location = 2) in uint transparency;
+#undef lowp
+#undef mediump
+#undef highp
 
-out vData
-{
-    vec3 position;
-    flat uint transparency;
-} vertex;
+layout(location = 0) in highp vec3 vertexPosition;
+layout(location = 2) in uint transparency;
 
-uniform mat4 MVP;
-uniform mat4 MODEL_MATRIX;
+flat out uint vs_transparency;
 
 void main()
 {
-    vertex.position = vertexPosition;
-    vertex.transparency = transparency;
-    gl_Position = MVP * MODEL_MATRIX * vec4(vertexPosition, 1.0);
+    vs_transparency = transparency & 0xFFu;
+    gl_Position = vec4(vertexPosition, 1.0);
 }
