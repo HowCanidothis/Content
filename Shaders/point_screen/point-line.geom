@@ -8,7 +8,7 @@ uniform float LINE_WIDTH;
 
 in vec2 v_position[]; // Raw screen position from vertex shader
 
-out vec2 v_lineTexCoord;    
+out vec2 v_screenDir;    
 
 void main()
 {
@@ -21,7 +21,9 @@ void main()
     if (length(lineDir) < 0.0001) {
         lineDir = vec2(1.0, 0.0);
     }
-    vec2 normal = normalize(vec2(-lineDir.y, lineDir.x));
+    
+    vec2 normalizedDir = normalize(lineDir);
+    vec2 normal = vec2(-normalizedDir.y, normalizedDir.x);
 
     // 3. Compute pixel offset and convert straight to NDC scale
     vec2 screenSpaceOffset = normal * (LINE_WIDTH * 0.5);
@@ -33,22 +35,22 @@ void main()
 
     // Vertex 0: Start Left
     gl_Position = vec4(clip0.xy - ndcOffset, 0.0, 1.0);
-    v_lineTexCoord = vec2(0.0, 0.0);
+    v_screenDir = normalizedDir;
     EmitVertex();
 
     // Vertex 1: Start Right
     gl_Position = vec4(clip0.xy + ndcOffset, 0.0, 1.0);
-    v_lineTexCoord = vec2(1.0, 0.0);
+    v_screenDir = normalizedDir;
     EmitVertex();
 
     // Vertex 2: End Left
     gl_Position = vec4(clip1.xy - ndcOffset, 0.0, 1.0);
-    v_lineTexCoord = vec2(0.0, 1.0);
+    v_screenDir = normalizedDir;
     EmitVertex();
 
     // Vertex 3: End Right
     gl_Position = vec4(clip1.xy + ndcOffset, 0.0, 1.0);
-    v_lineTexCoord = vec2(1.0, 1.0);
+    v_screenDir = normalizedDir;
     EmitVertex();
     
     EndPrimitive();

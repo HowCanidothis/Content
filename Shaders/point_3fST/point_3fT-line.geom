@@ -9,7 +9,7 @@ uniform vec2 SCREEN_SIZE;
 flat in uint vs_transparency[];
 
 flat out uint v_transparency;
-out vec2 v_lineTexCoord;    
+flat out vec2 v_screenDir;    
 
 void main()
 {
@@ -41,10 +41,16 @@ void main()
 
     // 5. Calculate the 2D pixel normal perpendicular direction
     vec2 lineDir = s1 - s0;
+    
+    // 2. If the segment is a point or too small, fall back to a safe default vector
     if (length(lineDir) < 0.0001) {
         lineDir = vec2(1.0, 0.0);
     }
-    vec2 normal = normalize(vec2(-lineDir.y, lineDir.x));
+    
+    // 3. FIX: Normalize the line direction FIRST before swapping components
+    vec2 normalizedDir = normalize(lineDir);
+    // 4. Derive the perfect perpendicular normal from the clean, normalized direction
+    vec2 normal = vec2(-normalizedDir.y, normalizedDir.x);
 
     // Calculate the exact screen pixel offset vector
     vec2 screenSpaceOffset = normal * (LINE_WIDTH * 0.5);
@@ -59,25 +65,25 @@ void main()
 
     // Vertex 0: Start Point - Left Offset
     gl_Position = vec4((ndc0 - ndcOffset) * p0.w, p0.z, p0.w);
-    v_lineTexCoord = vec2(0.0, 0.0);
+    v_screenDir = normalizedDir;
     v_transparency = vs_transparency[0];
     EmitVertex();
 
     // Vertex 1: Start Point - Right Offset
     gl_Position = vec4((ndc0 + ndcOffset) * p0.w, p0.z, p0.w);
-    v_lineTexCoord = vec2(1.0, 0.0);
+    v_screenDir = normalizedDir;
     v_transparency = vs_transparency[0];
     EmitVertex();
 
     // Vertex 2: End Point - Left Offset
     gl_Position = vec4((ndc1 - ndcOffset) * p1.w, p1.z, p1.w);
-    v_lineTexCoord = vec2(0.0, 1.0);
+    v_screenDir = normalizedDir;
     v_transparency = vs_transparency[1];
     EmitVertex();
 
     // Vertex 3: End Point - Right Offset
     gl_Position = vec4((ndc1 + ndcOffset) * p1.w, p1.z, p1.w);
-    v_lineTexCoord = vec2(1.0, 1.0);
+    v_screenDir = normalizedDir;
     v_transparency = vs_transparency[1];
     EmitVertex();
 
