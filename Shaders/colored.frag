@@ -1,13 +1,13 @@
-#version 450
+#version 330 core
 
-in fData
-{
-  vec3 color;
-} frag;
+in vec3 v_color;
 
+uniform float ALPHA;
+// 3. Out variables require explicit precision qualifiers
 layout(location = 0) out vec4 o_Color;
 
 void main()
 {
-    o_Color = vec4(frag.color, 1.0);
+    // Use the flattened v_color directly
+    o_Color = vec4(v_color, ALPHA);
 }

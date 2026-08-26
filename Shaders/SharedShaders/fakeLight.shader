@@ -1,7 +1,7 @@
-uniform float Ka = 1.0;
-uniform float Kd = 0.57;
-uniform float Ks = 0.5;
-uniform float SHININESS = 5.0;
+uniform vec3 Ka;
+uniform vec3 Kd;
+uniform vec3 Ks;
+uniform float SHININESS; // Remember to initialize this via C++ (e.g., 5.0f)
 
 vec4 phongFunction(const in vec3 ambientColor,
                    const in vec3 diffuseColor,
@@ -13,15 +13,19 @@ vec4 phongFunction(const in vec3 ambientColor,
 {
     vec3 N = normalize(worldNormal);
     vec3 L = normalize(lightDirection);
+    
     // Lambert's cosine law
     float lambertian = max(-dot(N, L), 0.0);
     float specular = 0.0;
+    
     if(lambertian > 0.0) {
         vec3 R = reflect(L, N);      // Reflected light vector
         vec3 V = normalize(L);
         float specAngle = max(-dot(R, V), 0.0);
         specular = pow(specAngle, SHININESS);
     }
+    
+    // Component multiplication now utilizes full vector math across channels
     return vec4(Ka * ambientColor +
                 Kd * lambertian * diffuseColor +
                 Ks * specular * specularColor, a);

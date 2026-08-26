@@ -1,20 +1,22 @@
-#version 450
+#version 330 core
 
-in fData
-{
-  vec3 normal;
-  vec3 position;
-} frag;
+// 3. Flattened standalone input variables matching your vertex/geometry shader outputs exactly
+in vec3 v_fragNormal;
+in vec3 v_fragPosition;
 
 uniform vec4 COLOR;
 uniform vec3 FORWARD;
 
+// 4. Output variable declaration requiring explicit precision qualifiers
 out vec4 fragColor;
 
 #line 0
+// Note: Ensure your internal "fakeLight.shader" utility is updated 
+// to use 'highp' parameters and '310 es' compatible syntax without parameter qualifiers.
 #include "fakeLight.shader"
 
 void main()
 {
-    fragColor = phongFunction(COLOR.rgb, COLOR.rgb, vec3(1.0), frag.position, frag.normal, vec3(0.0,0.0,-1.0), COLOR.a);
+    // FIXED: Replaced 'frag.position' and 'frag.normal' with flattened versions
+    fragColor = phongFunction(COLOR.rgb, COLOR.rgb, vec3(1.0), v_fragPosition, v_fragNormal, vec3(0.0, 0.0, -1.0), COLOR.a);
 }

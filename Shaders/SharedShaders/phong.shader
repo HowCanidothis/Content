@@ -1,10 +1,18 @@
-uniform vec3 Ka = vec3(0.3, 0.3, 0.3);
-uniform vec3 Kd = vec3(0.57, 0.57, 0.57);
-uniform vec3 Ks = vec3(0.5, 0.5, 0.5);
+// FIXED: Added mandatory highp qualifiers to your global Phong uniforms
+//const vec3 Ka=vec3(0.3, 0.3, 0.3);
+//const vec3 Kd=vec3(0.57, 0.57, 0.57);
+//const vec3 Ks=vec3(0.5, 0.5, 0.5);
 
-uniform float SHININESS = 2.0;
-uniform float LIGHT_INTENSITY = 1.0;
+//const float SHININESS = 2.0;
 
+uniform vec3 Ka;
+uniform vec3 Kd;
+uniform vec3 Ks;
+
+uniform float SHININESS;
+const float LIGHT_INTENSITY = 1.0;
+
+// SAFE FOR ES 3.10: No precision qualifiers inside the 'const in' parameter contexts
 vec4 phongFunction(const in vec3 ambientColor,
                    const in vec3 diffuseColor,
                    const in vec3 specularColor,

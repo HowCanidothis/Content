@@ -1,30 +1,30 @@
-#version 400
+#version 330 core
 
-in vData
-{
-    float dist;
-    flat uint transparency;
-} vertex;
-
-out vec4 fragColor;
+out vec4 f_fragColor;
 
 uniform vec4 COLOR;
-uniform vec2  SCREEN_SIZE;
-uniform uint pattern[10] = {1,1,1,1,0,1,1,1,1,0};
+uniform vec2 SCREEN_SIZE;
+
+uniform uint pattern[10];
 
 void main()
 {
-    vec4 fcoord = gl_FragCoord;
+    vec2 fcoord = gl_FragCoord.xy;
+    
     float dist = fcoord.x + fcoord.y;
     float modulo = mod(dist, 50.0) / 5.0;
-    uint patternValue = pattern[int(modulo)];
-    if(patternValue == 0)
+    
+    int index = clamp(int(modulo), 0, 9);
+    uint patternValue = pattern[index];
+    
+    if (patternValue == 0u) {
        discard;
+    }
 
-    if(fract(modulo) != 0.0 && pattern[int(mod(modulo + 1, 10))] == 0.0) {
+    int nextIndex = clamp(int(mod(modulo + 1.0, 10.0)), 0, 9);
+    if (fract(modulo) != 0.0 && pattern[nextIndex] == 0u) {
         discard;
     }
 
-
-    fragColor = COLOR;
+    f_fragColor = COLOR;
 }

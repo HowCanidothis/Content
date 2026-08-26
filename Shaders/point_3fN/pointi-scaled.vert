@@ -1,0 +1,121 @@
+#version 330 core
+
+uniform mat4 MVP;
+uniform mat4 MODEL_MATRIX;
+uniform float MESH_MAX_Z;
+
+layout(location = 0) in vec3 a_vertex;
+layout(location = 1) in vec3 a_vertexNormal;
+
+// Per-instance local transformation columns
+layout(location = 2) in vec4 a_col1;
+layout(location = 3) in vec4 a_col2;
+layout(location = 4) in vec4 a_col3;
+layout(location = 5) in vec4 a_col4;
+
+// 7-Point spline trajectory world paths
+layout(location = 6) in vec4 a_p1;
+layout(location = 7) in vec4 a_p2;
+layout(location = 8) in vec4 a_p3;
+layout(location = 9) in vec4 a_p4;
+layout(location = 10) in vec4 a_p5;
+layout(location = 11) in vec4 a_p6;
+layout(location = 12) in vec4 a_p7;
+
+// Flattened output attributes (No interface block)
+out vec3 v_fragNormal;
+out vec3 v_fragPosition;
+
+void main()
+{
+    // 1. Reconstruct the local per-instance transformation matrix
+    mat4 a_transform = mat4(a_col1, a_col2, a_col3, a_col4);
+    mat4 baseModelMatrix = MODEL_MATRIX * a_transform;
+
+    // 3. Interpolation progress along the cylinder path: t ranges from 0.0 to 1.0
+    float t = clamp(a_vertex.z / MESH_MAX_Z, 0.0, 1.0);
+
+    // 4. Construct the full 8-point world-space path
+    // FIXED: Changed to valid GLSL ES array constructor syntax
+    vec3 pos0 = baseModelMatrix[3].xyz;
+    vec3 path[8] = vec3[](
+        pos0,
+        a_p1.xyz,
+        a_p2.xyz,
+        a_p3.xyz,
+        a_p4.xyz,
+        a_p5.xyz,
+        a_p6.xyz,
+        a_p7.xyz
+    );
+
+    // 5. Determine which segment index (0 to 6) the vertex belongs to
+    float segmentProgress = t * 7.0;
+    int index = int(floor(segmentProgress));
+    index = clamp(index, 0, 6); 
+
+    // Calculate fractional progress inside the targeted segment
+    float segmentT = fract(segmentProgress);
+    if (index == 6) {
+        segmentT = clamp(segmentProgress - 6.0, 0.0, 1.0); 
+    }
+
+    // Interpolate the exact 3D world centerline position for this vertex depth
+    vec3 interpolatedWorldPos = mix(path[index], path[index + 1], segmentT);
+
+    // --- RECALCULATE MATRIX BASIS USING THE PATH DIRECTION ---
+    vec3 dirVector = interpolatedWorldPos - path[index];
+    if (length(dirVector) < 0.0001) {
+        dirVector = path[index + 1] - path[index];
+    }
+    vec3 newZ = normalize(dirVector);
+
+    // Extract original scaling factors from the base model matrix columns
+    float scaleX = length(baseModelMatrix[0].xyz);
+    float scaleY = length(baseModelMatrix[1].xyz);
+    float scaleZ = length(baseModelMatrix[2].xyz);
+
+    // Extract original up/right vectors for reference orientation
+    vec3 origX = normalize(baseModelMatrix[0].xyz);
+    vec3 origY = normalize(baseModelMatrix[1].xyz);
+
+    // Reconstruct orthogonal axes matching the new path direction vector (Z-aligned cylinder pipeline)
+    vec3 newX = normalize(cross(origY, newZ));
+    vec3 newY = normalize(cross(newZ, newX));
+
+    // Reapply original scaling factors to our newly oriented basis vectors
+    vec4 updatedCol1 = vec4(newX * scaleX, 0.0);
+    vec4 updatedCol2 = vec4(newY * scaleY, 0.0);
+    vec4 updatedCol3 = vec4(newZ * scaleZ, 0.0);
+
+    // Build the final transformed model matrix containing the updated orientation frame
+    mat4 finalModelMatrix = mat4(updatedCol1, updatedCol2, updatedCol3, baseModelMatrix[3]);
+    // --------------------------------------------------------
+
+    // 2. Camera distance scaling calculation
+    vec4 instanceWorldPos = vec4(interpolatedWorldPos, 1.0);
+    vec4 baseClipPos = MVP * instanceWorldPos;
+    float distanceToCamera = baseClipPos.w;
+    float baseScaleFactor = 0.1; 
+    float scaleCoef = max(distanceToCamera * baseScaleFactor, 1.0);
+
+    // 6. Calculate local bending offset relative to the starting position
+    vec3 worldBendingOffset = interpolatedWorldPos - pos0;
+
+    // Project the world space bending offset back into local mesh space
+    mat3 invModelRotScale = inverse(mat3(finalModelMatrix));
+    vec3 localBendingOffset = invModelRotScale * worldBendingOffset;
+
+    // 7. Calculate a_vertexBended by combining local scale, offset, and coordinates
+    vec4 a_vertexBended = vec4(
+        (a_vertex.xy * scaleCoef) + localBendingOffset.xy, 
+        localBendingOffset.z, 
+        1.0
+    );
+
+    // 8. Output transformation mapping fields to standard standalone attributes
+    v_fragPosition = (finalModelMatrix * a_vertexBended).xyz;
+    v_fragNormal = normalize((finalModelMatrix * vec4(a_vertexNormal, 0.0)).xyz);
+    
+    gl_Position = MVP * finalModelMatrix * a_vertexBended;
+}
