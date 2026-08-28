@@ -13,7 +13,6 @@ uniform vec3 FORWARD;
 uniform mat4 MVP;
 
 #line 19
-// Note: Ensure your internal helper files are updated to 310 es syntax and use highp!
 #include "math.shader"
 #include "phong.shader"
 

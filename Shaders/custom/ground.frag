@@ -13,7 +13,6 @@ uniform vec3 FORWARD;
 uniform mat4 MVP;
 
 #line 19
-// Note: Ensure your internal helper files are updated to 310 es syntax and use highp!
 #include "math.shader"
 #include "phong.shader"
 
@@ -97,6 +96,7 @@ float lightningCracks3D(vec3 p, out float centerMask) {
 
 void main()
 {
+    //float strictT = step(0.5, v_fragT);
     // Replaced interface variables with flat shader properties
     vec4 color = vec4(mix(v_fragColor.rgb, GRADIENT_COLOR, v_fragT), v_fragColor.a);
   

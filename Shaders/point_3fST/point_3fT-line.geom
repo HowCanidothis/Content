@@ -9,7 +9,8 @@ uniform vec2 SCREEN_SIZE;
 flat in uint vs_transparency[];
 
 flat out uint v_transparency;
-flat out vec2 v_screenDir;    
+flat out vec2 v_screenDir;
+out vec2 v_lineTexCoord;
 
 void main()
 {
@@ -66,24 +67,28 @@ void main()
     // Vertex 0: Start Point - Left Offset
     gl_Position = vec4((ndc0 - ndcOffset) * p0.w, p0.z, p0.w);
     v_screenDir = normalizedDir;
+    v_lineTexCoord = vec2(0.0, 0.0);
     v_transparency = vs_transparency[0];
     EmitVertex();
 
     // Vertex 1: Start Point - Right Offset
     gl_Position = vec4((ndc0 + ndcOffset) * p0.w, p0.z, p0.w);
     v_screenDir = normalizedDir;
+    v_lineTexCoord = vec2(1.0, 0.0);
     v_transparency = vs_transparency[0];
     EmitVertex();
 
     // Vertex 2: End Point - Left Offset
     gl_Position = vec4((ndc1 - ndcOffset) * p1.w, p1.z, p1.w);
     v_screenDir = normalizedDir;
+    v_lineTexCoord = vec2(0.0, 1.0);
     v_transparency = vs_transparency[1];
     EmitVertex();
 
     // Vertex 3: End Point - Right Offset
     gl_Position = vec4((ndc1 + ndcOffset) * p1.w, p1.z, p1.w);
     v_screenDir = normalizedDir;
+    v_lineTexCoord = vec2(1.0, 1.0);
     v_transparency = vs_transparency[1];
     EmitVertex();
 
