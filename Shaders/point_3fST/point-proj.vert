@@ -8,9 +8,9 @@ uniform mat4 MVP;
 uniform mat4 MODEL_MATRIX;
 
 // u_projectionPlane acts as a mask vector. E.g., vec3(0.0, 0.0, 1.0) means project along Z
-uniform vec3 PROJECTION_PLANE; 
+uniform vec3 PROJECTION_PLANE=vec3(0.0,0.0,0.0); 
 // The actual world coordinate bounding boundary plane to snap onto (e.g., box.Front())
-uniform float PLANE_COORDINATE;
+uniform float PLANE_COORDINATE=0.0;
 
 flat out uint vs_state;
 flat out uint vs_transparency;
